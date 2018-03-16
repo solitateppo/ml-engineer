@@ -1,0 +1,18 @@
+﻿AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Template for creating a training function
+Resources:
+  mltrain:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: train.lambda_handler
+      Runtime: python2.7
+      CodeUri: 's3://ml-engineer/cloudformation/lambda_templates/train.zip'
+      Description: ''
+      MemorySize: 3008
+      Timeout: 180
+      Role: 'arn:aws:iam::799052614850:role/service-role/ml-engineer'
+      FunctionName: !Sub '${AWS::StackName}-train'
+      Environment:
+        Variables:
+          PARTICIPANT: !Ref AWS::StackName
