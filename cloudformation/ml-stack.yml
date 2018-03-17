@@ -1,0 +1,72 @@
+﻿AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Template for creating a Lambda based ML API
+Resources:
+  TrainLambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: train.lambda_handler
+      Runtime: python2.7
+      CodeUri: 's3://ml-engineer/cloudformation/lambda_templates/train.zip'
+      Description: ''
+      MemorySize: 3008
+      Timeout: 180
+      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/ml-engineer'
+      FunctionName: !Sub '${AWS::StackName}-train'
+      Environment:
+        Variables:
+          PARTICIPANT: !Ref AWS::StackName
+  PredictLambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: predict.lambda_handler
+      Runtime: python2.7
+      CodeUri: 's3://ml-engineer/cloudformation/lambda_templates/predict.zip'
+      Description: ''
+      MemorySize: 3008
+      Timeout: 180
+      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/ml-engineer'
+      FunctionName: !Sub '${AWS::StackName}-predict'
+      Environment:
+        Variables:
+          PARTICIPANT: !Ref AWS::StackName
+  PredictApi:
+    Type: 'AWS::ApiGateway::RestApi'
+    Properties:
+      Body:
+        swagger: "2.0"
+        info:
+          title: !Ref AWS::StackName
+        basePath: "/dev"
+        schemes:
+          - "https"
+        paths:
+          /:
+            get:
+              produces:
+                - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-predict/invocations"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+        definitions:
+          Empty:
+            type: "object"
+            title: "Empty Schema"
+  PredictApiInvokePermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Sub '${AWS::StackName}-predict'
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PredictApi}/*/*/*'
