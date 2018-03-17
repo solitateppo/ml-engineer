@@ -1,5 +1,4 @@
 import boto3
-import botocore
 import zipfile
 import sys
 import os
