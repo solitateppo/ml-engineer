@@ -67,7 +67,7 @@ def train(iris):
 
 def store(model, s3_key):
     """Stores a model into S3 bucket 'ml-engineer' under the given key"""
-    joblib.dump(model, "/tmp/model.pkl")
+    joblib.dump(model, "/tmp/model.pkl", compress=1)
     s3 = boto3.client('s3')
     s3.upload_file("/tmp/model.pkl", "ml-engineer", s3_key)
 
