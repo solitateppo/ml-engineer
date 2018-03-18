@@ -44,6 +44,9 @@ import pandas as pd
 import numpy as np
 from sklearn.externals import joblib
 
+feature_names = ['sepal length (cm)', 'sepal width (cm)', 'petal length (cm)', 'petal width (cm)']
+target_names = ['setosa', 'versicolor', 'virginica']
+
 def fetch_model(s3_key_prefix):
     trained_model_file = "/tmp/trained-model.pkl"
     s3 = boto3.resource('s3')
@@ -51,8 +54,6 @@ def fetch_model(s3_key_prefix):
     return joblib.load(trained_model_file)
 
 def predict(model, params):
-    feature_names = ['sepal length (cm)', 'sepal width (cm)', 'petal length (cm)', 'petal width (cm)']
-    target_names = ['setosa', 'versicolor', 'virginica']
     df = pd.DataFrame(data = [[params["sepal_length"],
                                params["sepal_width"],
                                params["petal_length"],
