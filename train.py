@@ -46,6 +46,9 @@ import pandas as pd
 import numpy as np
 from sklearn.externals import joblib
 
+feature_names = ['sepal length (cm)', 'sepal width (cm)', 'petal length (cm)', 'petal width (cm)']
+target_names = ['setosa', 'versicolor', 'virginica']
+
 def train(iris):
     """Trains a model, returns a structure to persist"""
 
@@ -54,7 +57,6 @@ def train(iris):
     df['is_train'] = np.random.uniform(0, 1, len(df)) <= .75
 
     train_data, test_data = df[df['is_train']==True], df[df['is_train']==False]
-    features = df.columns[:4]
     y = pd.factorize(train_data['species'])[0]
 
     # Create a random forest Classifier. By convention, clf means 'Classifier'
@@ -62,8 +64,8 @@ def train(iris):
 
     # Train the Classifier to take the training features and learn how they relate
     # to the training y (the species)
-    print clf.fit(train_data[features], y)
-    return [clf, test_data, features]
+    print clf.fit(train_data[feature_names], y)
+    return [clf, test_data]
 
 def store(model, s3_key):
     """Stores a model into S3 bucket 'ml-engineer' under the given key"""
@@ -71,12 +73,12 @@ def store(model, s3_key):
     s3 = boto3.client('s3')
     s3.upload_file("/tmp/model.pkl", "ml-engineer", s3_key)
 
-def test(model, test_data, features, iris):
+def test(model, test_data):
     """Tests a model, logs to Cloudwatch only for now"""
-    print model.predict(test_data[features])
-    print model.predict_proba(test_data[features])[0:10]
+    print model.predict(test_data[feature_names])
+    print model.predict_proba(test_data[feature_names])[0:10]
 
-    preds = iris.target_names[model.predict(test_data[features])]
+    preds = np.array(target_names)[model.predict(test_data[feature_names])]
     print preds[0:5]
     print test_data['species'].head()
 
@@ -86,10 +88,10 @@ def lambda_handler(event, context):
     np.random.seed(0)
     iris = load_iris()
 
-    model, test_data, features = train(iris)
+    model, test_data = train(iris)
 
     store(model, "models/" + os.environ['PARTICIPANT'] + "/model.pkl")
 
-    test(model, test_data, features, iris)
+    test(model, test_data)
 
     return 'Model trained'
