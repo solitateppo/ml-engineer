@@ -22,9 +22,15 @@ def load(lib):
     print "loading " + lib
     cdll.LoadLibrary(lib)
 
+def load_native_libs(pack):
+    deps_path = "/tmp/deps/" + pack.replace("-", "_")
+    for lib in native_libs.get(pack, []):
+        load(deps_path + "/lib/" + lib)
+
 def load_pack(pack):
     pack_file = "/tmp/" + pack + ".zip"
     if os.path.isfile(pack_file):
+        load_native_libs(pack)
         return
 
     s3 = boto3.resource('s3')
@@ -36,8 +42,7 @@ def load_pack(pack):
     zip_ref.close()
     sys.path.append(deps_path)
 
-    for lib in native_libs.get(pack, []):
-        load(deps_path + "/lib/" + lib)
+    load_native_libs(pack)
 
 load_pack("sklearn-scipy-numpy")
 load_pack("pandas-numpy-pack")
