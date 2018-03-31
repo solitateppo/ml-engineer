@@ -14,8 +14,9 @@ Resources:
       Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/ml-engineer'
       FunctionName: !Sub '${AWS::StackName}-train'
       Environment:
+        # Expose Cloudformation Stack name as STACK_NAME environment variable for Lambda process
         Variables:
-          PARTICIPANT: !Ref AWS::StackName
+          STACK_NAME: !Ref AWS::StackName
   PredictLambda:
     Type: 'AWS::Serverless::Function'
     Properties:
@@ -28,8 +29,9 @@ Resources:
       Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/ml-engineer'
       FunctionName: !Sub '${AWS::StackName}-predict'
       Environment:
+        # Expose Cloudformation Stack name as STACK_NAME environment variable for Lambda process
         Variables:
-          PARTICIPANT: !Ref AWS::StackName
+          STACK_NAME: !Ref AWS::StackName
   PredictApi:
     Type: 'AWS::ApiGateway::RestApi'
     Properties:
