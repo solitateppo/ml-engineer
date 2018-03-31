@@ -10,7 +10,7 @@ Resources:
       CodeUri: 's3://ml-engineer/cloudformation/lambda_templates/train.zip'
       Description: ''
       MemorySize: 3008
-      Timeout: 180
+      Timeout: 300
       Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/ml-engineer'
       FunctionName: !Sub '${AWS::StackName}-train'
       Environment:
@@ -24,7 +24,7 @@ Resources:
       CodeUri: 's3://ml-engineer/cloudformation/lambda_templates/predict.zip'
       Description: ''
       MemorySize: 3008
-      Timeout: 180
+      Timeout: 300
       Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/ml-engineer'
       FunctionName: !Sub '${AWS::StackName}-predict'
       Environment:
