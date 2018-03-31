@@ -5,10 +5,10 @@ Resources:
   TrainLambda:
     Type: 'AWS::Serverless::Function'
     Properties:
+      Description: 'Trains a ML model'
       Handler: train.lambda_handler
       Runtime: python2.7
       CodeUri: 's3://ml-engineer/cloudformation/lambda_templates/train.zip'
-      Description: ''
       MemorySize: 3008
       Timeout: 300
       Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/ml-engineer'
@@ -19,10 +19,10 @@ Resources:
   PredictLambda:
     Type: 'AWS::Serverless::Function'
     Properties:
+      Description: 'Predicts based existing ML model'
       Handler: predict.lambda_handler
       Runtime: python2.7
       CodeUri: 's3://ml-engineer/cloudformation/lambda_templates/predict.zip'
-      Description: ''
       MemorySize: 3008
       Timeout: 300
       Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/ml-engineer'
