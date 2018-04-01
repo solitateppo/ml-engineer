@@ -57,14 +57,14 @@ from sklearn.externals import joblib
 feature_names = ['sepal length (cm)', 'sepal width (cm)', 'petal length (cm)', 'petal width (cm)']
 target_names = ['setosa', 'versicolor', 'virginica']
 
-def train(iris):
+def train_classifier(iris):
     """Trains a model, returns a structure to persist"""
 
-    df = pd.DataFrame(iris.data, columns=iris.feature_names)
-    df['species'] = pd.Categorical.from_codes(iris.target, iris.target_names)
+    df = pd.DataFrame(iris.data, columns=feature_names)
+    df['species'] = pd.Categorical.from_codes(iris.target, target_names)
     df['is_train'] = np.random.uniform(0, 1, len(df)) <= .75
 
-    train_data, test_data = df[df['is_train']==True], df[df['is_train']==False]
+    train_data = df[df['is_train']==True]
     y = pd.factorize(train_data['species'])[0]
 
     # Create a random forest Classifier. By convention, clf means 'Classifier'
@@ -73,33 +73,25 @@ def train(iris):
     # Train the Classifier to take the training features and learn how they relate
     # to the training y (the species)
     print clf.fit(train_data[feature_names], y)
-    return [clf, test_data]
+    return clf
 
-def store(model, s3_key):
+def store_model_to_s3(model, s3_key):
     """Stores a model into S3 bucket 'ml-engineer' under the given key"""
     joblib.dump(model, "/tmp/model.pkl", compress=1)
     s3 = boto3.client('s3')
     s3.upload_file("/tmp/model.pkl", "ml-engineer", s3_key)
 
-def test(model, test_data):
-    """Tests a model, logs to Cloudwatch only for now"""
-    print model.predict(test_data[feature_names])
-    print model.predict_proba(test_data[feature_names])[0:10]
-
-    preds = np.array(target_names)[model.predict(test_data[feature_names])]
-    print preds[0:5]
-    print test_data['species'].head()
-
-    print pd.crosstab(test_data['species'], preds, rownames=['Actual Species'], colnames=['Predicted Species'])
+def make_s3_key(model_filename):
+    return "models/" + os.environ['STACK_NAME'] + "/" + model_filename
 
 def lambda_handler(event, context):
+    """Entry point of training Lambda event execution"""
+
     np.random.seed(0)
     iris = load_iris()
 
-    model, test_data = train(iris)
+    model = train_classifier(iris)
 
-    store(model, "models/" + os.environ['PARTICIPANT'] + "/model.pkl")
-
-    test(model, test_data)
+    store_model_to_s3(model, make_s3_key("model.pkl"))
 
     return 'Model trained'
