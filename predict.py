@@ -55,24 +55,35 @@ from sklearn.externals import joblib
 feature_names = ['sepal length (cm)', 'sepal width (cm)', 'petal length (cm)', 'petal width (cm)']
 target_names = ['setosa', 'versicolor', 'virginica']
 
-def fetch_model(s3_key_prefix):
+def make_s3_key(model_filename):
+    return "models/" + os.environ['STACK_NAME'] + "/" + model_filename
+
+def fetch_model(s3_key):
+    """Fetches a model from S3, return the model read into memory with joblib"""
+
     trained_model_file = "/tmp/trained-model.pkl"
     s3 = boto3.resource('s3')
-    s3.Bucket("ml-engineer").download_file(s3_key_prefix + "model.pkl", trained_model_file)
+    s3.Bucket("ml-engineer").download_file(s3_key, trained_model_file)
     return joblib.load(trained_model_file)
 
 def predict(model, params):
+    """Returns a prediction based on model and parameters"""
     df = pd.DataFrame(data = [[params["sepal_length"],
                                params["sepal_width"],
                                params["petal_length"],
                                params["petal_width"]]],
                       columns=feature_names)
-    return np.array(target_names)[model.predict(df)]
+    return np.array(target_names)[model.predict(df)][0]
 
 def lambda_handler(event, context):
+    """
+    Entry point of training Lambda event execution.
+      'event' parameter in the form of Lambda proxy integration, see
+      https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
+    """
     np.random.seed(0)
 
-    model = fetch_model("models/" + os.environ['PARTICIPANT'] + "/")
+    model = fetch_model(make_s3_key("model.pkl"))
     result = predict(model, event['queryStringParameters'])
     return {"statusCode": 200,
             "isBase64Encoded": False,
