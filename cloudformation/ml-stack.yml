@@ -1,37 +1,68 @@
 ﻿AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Template for creating a Lambda based ML API
+Globals:
+  Function:
+    Runtime: python2.7
+    MemorySize: 3008
+    Timeout: 300
+    Environment:
+      # Expose Cloudformation Stack name as STACK_NAME environment variable for Lambda process
+      Variables:
+        STACK_NAME: !Ref AWS::StackName
+    Tags:
+      project: ml-engineer
 Resources:
+  LambdaRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-lambda-role'
+      Path: /service-role/
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: S3ReadWrite
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:*
+                Resource:
+                  - !Sub 'arn:aws:s3:::${S3Bucket}/*'
+                  - !Sub 'arn:aws:s3:::${S3Bucket}'
+                  - 'arn:aws:s3:::ml-engineer/*'
+                  - 'arn:aws:s3:::ml-engineer'
   TrainLambda:
     Type: 'AWS::Serverless::Function'
     Properties:
       Description: 'Trains a ML model'
       Handler: train.lambda_handler
-      Runtime: python2.7
       CodeUri: 's3://ml-engineer/cloudformation/lambda_templates/train.zip'
-      MemorySize: 3008
-      Timeout: 300
-      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/ml-engineer'
+      Role: !GetAtt LambdaRole.Arn
       FunctionName: !Sub '${AWS::StackName}-train'
-      Environment:
-        # Expose Cloudformation Stack name as STACK_NAME environment variable for Lambda process
-        Variables:
-          STACK_NAME: !Ref AWS::StackName
   PredictLambda:
     Type: 'AWS::Serverless::Function'
     Properties:
       Description: 'Predicts based existing ML model'
       Handler: predict.lambda_handler
-      Runtime: python2.7
       CodeUri: 's3://ml-engineer/cloudformation/lambda_templates/predict.zip'
-      MemorySize: 3008
-      Timeout: 300
-      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/ml-engineer'
+      Role: !GetAtt LambdaRole.Arn
       FunctionName: !Sub '${AWS::StackName}-predict'
-      Environment:
-        # Expose Cloudformation Stack name as STACK_NAME environment variable for Lambda process
-        Variables:
-          STACK_NAME: !Ref AWS::StackName
+  S3Bucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Sub '${AWS::StackName}'
+      Tags:
+        - Key: project
+          Value: ml-engineer
   PredictApi:
     Type: 'AWS::ApiGateway::RestApi'
     Properties:
@@ -56,7 +87,7 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
-                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-predict/invocations"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${PredictLambda}/invocations"
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
@@ -69,6 +100,6 @@ Resources:
     Type: "AWS::Lambda::Permission"
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName: !Sub '${AWS::StackName}-predict'
+      FunctionName: !Ref PredictLambda
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PredictApi}/*/*/*'
