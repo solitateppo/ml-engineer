@@ -75,14 +75,12 @@ def train_classifier(iris):
     print clf.fit(train_data[feature_names], y)
     return clf
 
-def store_model_to_s3(model, s3_key):
+def store_model_to_s3(model, bucket, key):
     """Stores a model into S3 bucket 'ml-engineer' under the given key"""
     joblib.dump(model, "/tmp/model.pkl", compress=1)
     s3 = boto3.client('s3')
-    s3.upload_file("/tmp/model.pkl", "ml-engineer", s3_key)
-
-def make_s3_key(model_filename):
-    return "models/" + os.environ['STACK_NAME'] + "/" + model_filename
+    s3.upload_file("/tmp/model.pkl", bucket, key)
+    os.remove("/tmp/model.pkl")
 
 def lambda_handler(event, context):
     """Entry point of training Lambda event execution"""
@@ -92,6 +90,6 @@ def lambda_handler(event, context):
 
     model = train_classifier(iris)
 
-    store_model_to_s3(model, make_s3_key("model.pkl"))
+    store_model_to_s3(model, os.environ['STACK_NAME'], "model.pkl")
 
     return 'Model trained'

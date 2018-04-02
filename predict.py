@@ -55,16 +55,15 @@ from sklearn.externals import joblib
 feature_names = ['sepal length (cm)', 'sepal width (cm)', 'petal length (cm)', 'petal width (cm)']
 target_names = ['setosa', 'versicolor', 'virginica']
 
-def make_s3_key(model_filename):
-    return "models/" + os.environ['STACK_NAME'] + "/" + model_filename
-
-def fetch_model(s3_key):
+def fetch_model(bucket, key):
     """Fetches a model from S3, return the model read into memory with joblib"""
 
     trained_model_file = "/tmp/trained-model.pkl"
     s3 = boto3.resource('s3')
-    s3.Bucket("ml-engineer").download_file(s3_key, trained_model_file)
-    return joblib.load(trained_model_file)
+    s3.Bucket(bucket).download_file(key, trained_model_file)
+    model = joblib.load(trained_model_file)
+    os.remove(trained_model_file)
+    return model
 
 def predict(model, params):
     """Returns a prediction based on model and parameters"""
@@ -83,7 +82,7 @@ def lambda_handler(event, context):
     """
     np.random.seed(0)
 
-    model = fetch_model(make_s3_key("model.pkl"))
+    model = fetch_model(os.environ['STACK_NAME'], "model.pkl")
     result = predict(model, event['queryStringParameters'])
     return {"statusCode": 200,
             "isBase64Encoded": False,
