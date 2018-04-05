@@ -1,5 +1,11 @@
 # Machine Learning Engineer Programme - Exercise 4
 
+Task 1 is about using AWS, task 2 is a study on compute environment in AWS.
+
+## Task 1
+
+Use AWS Lambda for running the model (train and predict) created in previous exercise (task 1. might be more amenable).
+
 1. Login to AWS
   * For Solita sandbox login, see: https://intra.solita.fi/display/RJO/Solita+AWS+Sandbox+login
 2. Create Cloudformation stack by using: https://s3-eu-west-1.amazonaws.com/ml-engineer/cloudformation/ml-stack.yml
@@ -28,4 +34,11 @@
   * Browse to the URL, pass query string
 6. Plug your own algorithm and model
 7. Test it
-8. Deploy and share to #ml-engineer
+8. Deploy and share link to the API to Slack
+
+## Task 2
+
+Study machine learning compute environments available in AWS. This might be a good time to look into Sagemaker service,
+if you'r not already familiar with it: https://aws.amazon.com/sagemaker/
+
+Idea is to discuss about the compute environments in the exercise meeting on 27.4.2018.
