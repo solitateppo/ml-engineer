@@ -1,7 +1,7 @@
 # Machine Learning Engineer Programme - Exercise 4
 
 1. Login to AWS
-  * For Solita sandbox login, see: <link to intra>
+  * For Solita sandbox login, see: https://intra.solita.fi/display/RJO/Solita+AWS+Sandbox+login
 2. Create Cloudformation stack by using: https://s3-eu-west-1.amazonaws.com/ml-engineer/cloudformation/ml-stack.yml
   * Name the stack as `mle4-<username>`
   * This will create the following resources:
