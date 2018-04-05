@@ -17,7 +17,8 @@ Use AWS Lambda for running the model (train and predict) created in previous exe
     * API Gateway REST API named `mle4-<username>`
       * With `/` route mapped to `mle4-<username>-predict` Lambda
 3. Train the example model by running `mle4-<username>-train` Lambda
-  * Configure test event:
+4. Test the example model by running `mle4-<username>-predict` Lambda
+  * Configure a test event:
   ```
   {"queryStringParameters":
     {"sepal_length": 1,
@@ -25,16 +26,16 @@ Use AWS Lambda for running the model (train and predict) created in previous exe
      "petal_length": 1,
      "petal_width": 1}}
   ```
-4. Test the sample API Gateway
+5. Test the sample API Gateway
   * Select `GET` method of `/` resource
   * Press `Test` and pass query string: `?sepal_length=1&sepal_width=1&petal_length=1&petal_width=1`
-5. Deploy the sample API
+6. Deploy the sample API
   * Click `Actions`, select `Deploy API`
   * Create new stage named `dev` and click `Deploy`
   * Browse to the URL, pass query string
-6. Plug your own algorithm and model
-7. Test it
-8. Deploy and share link to the API to Slack
+7. Plug your own algorithm and model
+8. Test it
+9. Deploy and share link to the API to Slack
 
 ## Task 2
 
