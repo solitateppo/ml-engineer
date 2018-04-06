@@ -20,6 +20,21 @@ Use AWS Lambda for running the model (train and predict) created in previous exe
       * With `/` route mapped to `mle4-<username>-predict` Lambda
     * S3 Bucket named `mle4-<username>`
       * Intended for model storage, train Lambda creates `model.pkl` file, persisted with joblib
+  * Go to Cloudformation console https://eu-west-1.console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks?filter=active
+    * Press `Create Stack` button
+    * Select `Specify an Amazon S3 template URL`: with value https://s3-eu-west-1.amazonaws.com/ml-engineer/cloudformation/ml-stack.yml
+      * and press Next
+    * Name the stack as: `mle4-<username>` and press Next
+    * Accept default values on the next page ("Options") and press Next
+    * On Review page:
+      * Under Capabilities, check options:
+        * I acknowledge that AWS CloudFormation might create IAM resources.
+        * I acknowledge that AWS CloudFormation might create IAM resources with custom names.
+      * On Transform section, press "Create Change Set" button
+        * Wait until list of resources is shown
+        * Then press Execute
+        * Wait until Status is CREATE_COMPLETE
+      
 3. Train the example model by running `mle4-<username>-train` Lambda
 4. Test the example model by running `mle4-<username>-predict` Lambda
   * Configure a test event:
