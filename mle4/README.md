@@ -8,8 +8,8 @@ Use AWS Lambda for running the model (train and predict) created in previous exe
 
 1. Login to AWS
   * For Solita sandbox login, see: https://intra.solita.fi/display/RJO/Solita+AWS+Sandbox+login
-  * Change to Ireland region (`eu-west-1`, console will remember this after first login) 
-![image](https://user-images.githubusercontent.com/57011/38420366-206bb5da-39ac-11e8-902f-553ddef3ed5f.png)
+  * Change to Ireland region (`eu-west-1`, console will remember this after first login)
+  ![image](https://user-images.githubusercontent.com/57011/38420366-206bb5da-39ac-11e8-902f-553ddef3ed5f.png)
 2. Create Cloudformation stack by using: https://s3-eu-west-1.amazonaws.com/ml-engineer/cloudformation/ml-stack.yml
   * Name the stack as `mle4-<username>`
   * This will create the following resources:
@@ -18,6 +18,8 @@ Use AWS Lambda for running the model (train and predict) created in previous exe
       * `mle4-<username>-predict` for using a trained model for prediction
     * API Gateway REST API named `mle4-<username>`
       * With `/` route mapped to `mle4-<username>-predict` Lambda
+    * S3 Bucket named `mle4-<username>`
+      * Intended for model storage, train Lambda creates `model.pkl` file, persisted with joblib
 3. Train the example model by running `mle4-<username>-train` Lambda
 4. Test the example model by running `mle4-<username>-predict` Lambda
   * Configure a test event:
