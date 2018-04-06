@@ -9,7 +9,7 @@ Use AWS Lambda for running the model (train and predict) created in previous exe
 1. Login to AWS
   * For Solita sandbox login, see: https://intra.solita.fi/display/RJO/Solita+AWS+Sandbox+login
   * Change to Ireland region (`eu-west-1`, console will remember this after first login) 
-  ![image](https://user-images.githubusercontent.com/57011/38420366-206bb5da-39ac-11e8-902f-553ddef3ed5f.png)
+![image](https://user-images.githubusercontent.com/57011/38420366-206bb5da-39ac-11e8-902f-553ddef3ed5f.png)
 2. Create Cloudformation stack by using: https://s3-eu-west-1.amazonaws.com/ml-engineer/cloudformation/ml-stack.yml
   * Name the stack as `mle4-<username>`
   * This will create the following resources:
