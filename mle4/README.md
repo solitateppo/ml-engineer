@@ -42,4 +42,6 @@ Use AWS Lambda for running the model (train and predict) created in previous exe
 Study machine learning compute environments available in AWS. This might be a good time to look into Sagemaker service,
 if you'r not already familiar with it: https://aws.amazon.com/sagemaker/
 
+If you also try out AWS services, it's a good idea to tag the resources with `project: ml-engineer`.
+
 Idea is to discuss about the compute environments in the exercise meeting on 27.4.2018.
