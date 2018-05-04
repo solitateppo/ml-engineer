@@ -13,8 +13,8 @@ Task 1 is about handling different files with code, task2 handling data in datab
   * Windows:
     * Download postgresql from [https://www.postgresql.org/download/windows/](https://www.postgresql.org/download/windows/) and install with installer
 3. Create database from 'adult_dump.sql'
-4. Merge both different files and data in database star shema by your own code
-5. Cleaning you data (remove duplicate rows etc) so that data looks like same as 3. exercice's data
+4. Read all data files ('adult.json', 'adult.parquet','adult.xml','adult1.json','adult2.json') and the database dump into your application (in-memory).
+5. Merge and cleaning your data (remove duplicate rows etc) so that data looks like same as 3. exercice's  adult data
 6. Run your machine learning model (the same model you built in the third exercise) with this dataset
 
 
