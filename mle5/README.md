@@ -7,11 +7,11 @@ Task 1 is about handling different files with code, task2 handling data in datab
 1. Clone current repository for your computer
 2. Install postgresql database to you computer, if not exist
   * MAC:
-  ** 'brew update'
-  ** 'brew install postgresql'
-  ** 'brew services start postgresql'
+    * `brew update`
+    * `brew install postgresql`
+    * `brew services start postgresql`
   * Windows:
-  ** Download postgresql from [https://www.postgresql.org/download/windows/](https://www.postgresql.org/download/windows/) and install with installer
+    * Download postgresql from [https://www.postgresql.org/download/windows/](https://www.postgresql.org/download/windows/) and install with installer
 3. Create database from 'adult_dump.sql'
 4. Merge both different files and data in database star shema by your own code
 5. Cleaning you data (remove duplicate rows etc) so that data looks like same as 3. exercice's data
